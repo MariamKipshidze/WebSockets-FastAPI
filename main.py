@@ -4,10 +4,16 @@ from pydantic import BaseModel, Field
 from starlette.responses import HTMLResponse
 
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
-templates = Jinja2Templates(directory="templates")
+# -- Settings
 
 app = FastAPI()
+
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# -- APIs
 
 
 class Student(BaseModel):
@@ -41,3 +47,8 @@ async def hello():
 @app.get("/hello/with_template/{name}", response_class=HTMLResponse)
 async def hello(request: Request, name: str):
     return templates.TemplateResponse("hello.html", {"request": request, "name": name})
+
+
+@app.get("/hello/with_js/{name}", response_class=HTMLResponse)
+async def hello(request: Request, name: str):
+    return templates.TemplateResponse("hello_with_js.html", {"request": request, "name": name})
